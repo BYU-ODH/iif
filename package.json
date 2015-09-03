@@ -1,0 +1,18 @@
+{
+  "name": "iif-backend",
+  "version": "0.0.1",
+  "description": "Backend api for International Internship Funding web app",
+  "main": "api.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jarom McDonald",
+  "license": "MPL 2.0",
+  "dependencies": {
+    "falcor": "^0.1.12",
+    "falcor-restify": "^1.1.1",
+    "falcor-router": "^0.2.9",
+    "promised-mongo": "^1.2.0",
+    "restify": "^4.0.0"
+  }
+}
