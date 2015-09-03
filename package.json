@@ -9,6 +9,7 @@
   "author": "Jarom McDonald",
   "license": "MPL 2.0",
   "dependencies": {
+    "bunyan": "^1.4.0",
     "falcor": "^0.1.12",
     "falcor-restify": "^1.1.1",
     "falcor-router": "^0.2.9",
