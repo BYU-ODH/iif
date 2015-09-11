@@ -47,7 +47,7 @@ var getAll = function(model) {
 }
   
 var router = new Router([{
-  route: "applications",
+  route: "students['name', 'description']",
   get: function(pathSet) {
     return pathMap[pathSet[0]].find().exec().then(function(documents) {
       return {"path":pathSet,"value":JSON.stringify(documents)};
