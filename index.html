@@ -4,8 +4,8 @@
     <script src="//netflix.github.io/falcor/build/falcor.browser.js"></script>
     <script>
       var model = new falcor.Model({source: new falcor.HttpDataSource('/model.json') });
-      model.get("applications").then(function(response) {
-          console.log(response);
+      model.get(["students", {from: 0, to: 0}, ["netid", "admin"]]).then(function(response) {
+        console.log(response);
       });
     </script>
   </head>

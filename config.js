@@ -3,7 +3,7 @@ var config = {
     url: 'http://localhost',
     database: {
       user:	'iif-client',
-	    passwd:	'IfYouWant2seeMe!',
+	    passwd:	'IfYouWant2SeeMe!',
 	    host:	'ds035703.mongolab.com',
 	    port:	'35703',
 	    db:	'iif'
