@@ -11,7 +11,7 @@ var Application = require('./models/application');
 
 var LOG = bunyan.createLogger({
     name: 'demo',
-    level: bunyan.DEBUG,
+    level: bunyan.INFO,
     src: true
 });
 
@@ -36,22 +36,24 @@ var server = restify.createServer({
 var creds=config.database.user+":"+config.database.passwd;
 var conn_uri='mongodb://'+creds+'@'+config.database.host+':'+config.database.port+'/'+config.database.db;
 var db=mongoose.connect(conn_uri,['students','applications']);
-
-var pathMap = {
-  "applications": Application,
-  "students": Student
-}
-
-var getAll = function(model) {
-  return model.find().exec();
-}
   
 var router = new Router([{
-  route: "students['name', 'description']",
+  route: "students[{keys}]",
   get: function(pathSet) {
-    return pathMap[pathSet[0]].find().exec().then(function(documents) {
-      return {"path":pathSet,"value":JSON.stringify(documents)};
-    });
+    if (typeof pathSet[1][0] === "undefined") {
+      return Student.find().exec().then(function(documents) {
+        return {"path":["students"],"value":JSON.stringify(documents)};
+      });
+    }
+    else {
+      return Student.find({ 'netid': {$in: pathSet[1] }}).exec().then(function(documents) {
+        var results=[];
+        documents.forEach(function(document) {
+          results.push({"path":[pathSet[0],document.netid],"value":JSON.stringify(document)});
+        });
+        return results;
+      });
+    }
   }
 }]);
 
@@ -60,11 +62,11 @@ server.use(restify.bodyParser());
 server.use(restify.requestLogger());
 server.use(restify.queryParser());
 
-server.on('after', restify.auditLogger({
-    log: LOG.child({
-        component: 'audit'
-    })
-}));
+//server.on('after', restify.auditLogger({
+//    log: LOG.child({
+//        component: 'audit'
+//    })
+//}));
 
 server.on('uncaughtException', function (req, res, route, err) {
     req.log.error(err, 'got uncaught exception');
