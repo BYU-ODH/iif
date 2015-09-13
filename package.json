@@ -2,7 +2,7 @@
   "name": "iif-backend",
   "version": "0.0.1",
   "description": "Backend api for International Internship Funding web app",
-  "main": "api.js",
+  "main": "api/api.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

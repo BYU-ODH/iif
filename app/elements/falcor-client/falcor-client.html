@@ -1,0 +1,22 @@
+<dom-module id="falcor-client">
+  <template>
+    <h1 class="paper-font-display1"><span>{{greeting}}</span></h1>
+  </template>
+
+  <script>
+    (function() {
+      Polymer({
+        is: 'falcor-client',
+
+        properties: {
+          greeting: {
+            type: String,
+            value: '!',
+            notify: true
+          }
+        }
+      });
+    })();
+  </script>
+
+</dom-module>
