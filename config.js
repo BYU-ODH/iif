@@ -1,6 +1,6 @@
 var config = {
   development: {
-    url: 'http://localhost',
+    url: 'https://jmcdonald.byu.edu:8443',
     database: {
       user:	'iif-client',
 	    passwd:	'IfYouWant2SeeMe!',
@@ -10,7 +10,7 @@ var config = {
     },
     server: {
         host: '0.0.0.0',
-        port: '5000'
+        port: '8443'
     }
   }
 };

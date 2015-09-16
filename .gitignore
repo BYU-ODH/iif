@@ -25,4 +25,4 @@ build/Release
 # Dependency directory
 node_modules
 
-app/bower_components/*
+bower_components/*

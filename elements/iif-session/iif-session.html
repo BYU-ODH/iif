@@ -1,0 +1,44 @@
+<link href="../../bower_components/iron-icons/iron-icons.html" rel="import"/>
+<link href="../../bower_components/iron-icon/iron-icon.html" rel="import"/>
+<link href="../../bower_components/iron-localstorage/iron-localstorage.html" rel="import"/>
+<link href="../../bower_components/paper-button/paper-button.html" rel="import"/>
+<link href="../../bower_components/paper-input/paper-input.html" rel="import"/>
+<link href="../falcor-client/falcor-client.html" rel="import"/>
+<dom-module id="iif-session">
+  <template>
+    <iron-localstorage name="iif-storage" value="{{student}}" on-iron-localstorage-load-empty="initializeStudent"></iron-localstorage>
+    <template is="dom-if" if="{{!student.netid}}">
+      <p>If you're interested in being considered for funding for your upcoming international internship, please sign in and complete the short form.</p>
+      <p>To Do: Have someone compose better prose as an intro here.</p>
+      <paper-input label="NetID" value="{{possible_student.netid}}"></paper-input><br/>
+      <paper-input label="Password" type="password" value="{{possible_student.password}}"></paper-input><br/>
+      <paper-button raised on-click="startLoginFlow">
+        <iron-icon icon="perm-identity"></iron-icon> Sign in
+      </paper-button>
+      <falcor-client datasource="/model.json" id="casLogin"></falcor-client>
+    </template>
+  </template>
+  <script>
+    Polymer({
+      is: 'iif-session',
+      properties: {
+        student: {
+          type: Object
+        },
+        possible_student: {
+          type: Object
+        }
+      },
+      // initializes default if nothing has been stored
+      initializeStudent: function() {
+        this.student = {
+          netid: false,
+          token: false
+        }
+      },
+      startLoginFlow: function() {
+        console.log(this.possible_student);
+      }
+    });
+  </script>
+</dom-module>

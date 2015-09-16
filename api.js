@@ -1,11 +1,13 @@
 var env = process.env.NODE_ENV || 'development';
 var config = require('./config')[env];
+var fs= require('fs');
 var bunyan = require('bunyan');
 var restify = require('restify');
 var restifyMiddleware = require('falcor-restify');
 var falcor = require('falcor');
 var mongoose = require('mongoose');
 var Router = require('falcor-router');
+var cas = require('byu-cas');
 var Student = require('./models/student');
 var Application = require('./models/application');
 
@@ -16,6 +18,9 @@ var LOG = bunyan.createLogger({
 });
 
 var server = restify.createServer({
+  certificate: fs.readFileSync('/etc/ssl/certs/jmcdonald.crt'),
+  key: fs.readFileSync('/etc/ssl/private/jmcdonald_byu_edu.key'),
+  ca: fs.readFileSync('/etc/ssl/certs/jmcdonald_ca.crt'),
   log: LOG.child({
     component: 'server',
     level: bunyan.INFO,
@@ -38,6 +43,21 @@ var conn_uri='mongodb://'+creds+'@'+config.database.host+':'+config.database.por
 var db=mongoose.connect(conn_uri,['students','applications']);
   
 var router = new Router([{
+  route: "credentials[{keys}]",
+  get: function(pathSet) {
+    return cas.getTicket(pathSet[1],pathSet[2], config.url)
+    .then(function(ticket){
+      return cas.validate(ticket, config.url);
+    })
+    .then(function success(response) {
+      return {"path":[response.username],"value":response.attributes};
+    })
+    .catch(function error(e) {
+      console.log("Invalid ticket. Error message was: " + e.message);
+    });
+  }
+},
+{
   route: "students[{keys}]",
   get: function(pathSet) {
     if (typeof pathSet[1][0] === "undefined") {
@@ -88,18 +108,22 @@ server.use(restify.queryParser());
 //}));
 
 server.on('uncaughtException', function (req, res, route, err) {
-    req.log.error(err, 'got uncaught exception');
+  req.log.error(err, 'got uncaught exception');
+});
+
+server.get('/login', function (req, res, next) {
+  auth.doCasLogin();
 });
 
 server.get('/model.json', restifyMiddleware(function (req, res, next) {
-    return router;
+  return router;
 }));
 
 server.get(/\/.*/, restify.serveStatic({
-    directory: __dirname,
-    default: 'index.html'
+  directory: __dirname,
+  default: 'index.html'
 }));
 
 server.listen(config.server.port,function() {
-    LOG.info("Server started on port %s",config.server.port);
+  LOG.info("Server started on port %s",config.server.port);
 });
