@@ -4,11 +4,9 @@ var cas = require('byu-cas');
 var service = config.url;
 
 auth= {
-  doCasLogin:function() {
-    var ticket = cas.getTicket('jlm59', '6hmdewitt9buffy', service)
-    .then(function(ticket){
-      return cas.validate(ticket, service);
-    })
+  cas_server: "https://byu.edu/cas/",
+  validateLogin:function() {
+    return cas.validate(ticket, service)
     .then(function success(response) {
       return {"netid":response.username,"attributes":response.attributes};
     })

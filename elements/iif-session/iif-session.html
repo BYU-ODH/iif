@@ -10,12 +10,9 @@
     <template is="dom-if" if="{{!student.netid}}">
       <p>If you're interested in being considered for funding for your upcoming international internship, please sign in and complete the short form.</p>
       <p>To Do: Have someone compose better prose as an intro here.</p>
-      <paper-input label="NetID" value="{{possible_student.netid}}"></paper-input><br/>
-      <paper-input label="Password" type="password" value="{{possible_student.password}}"></paper-input><br/>
       <paper-button raised on-click="startLoginFlow">
         <iron-icon icon="perm-identity"></iron-icon> Sign in
       </paper-button>
-      <falcor-client datasource="/model.json" id="casLogin"></falcor-client>
     </template>
   </template>
   <script>
@@ -23,9 +20,6 @@
       is: 'iif-session',
       properties: {
         student: {
-          type: Object
-        },
-        possible_student: {
           type: Object
         }
       },
@@ -37,7 +31,7 @@
         }
       },
       startLoginFlow: function() {
-        console.log(this.possible_student);
+        window.location = "/login";
       }
     });
   </script>

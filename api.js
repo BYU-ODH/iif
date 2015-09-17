@@ -1,5 +1,7 @@
 var env = process.env.NODE_ENV || 'development';
 var config = require('./config')[env];
+var auth = require('./auth');
+
 var fs= require('fs');
 var bunyan = require('bunyan');
 var restify = require('restify');
@@ -7,7 +9,6 @@ var restifyMiddleware = require('falcor-restify');
 var falcor = require('falcor');
 var mongoose = require('mongoose');
 var Router = require('falcor-router');
-var cas = require('byu-cas');
 var Student = require('./models/student');
 var Application = require('./models/application');
 
@@ -112,7 +113,18 @@ server.on('uncaughtException', function (req, res, route, err) {
 });
 
 server.get('/login', function (req, res, next) {
-  auth.doCasLogin();
+  console.log(req.query);
+  login_url=auth.cas_server+"?service="+config.auth.login+"&next="+config.auth.callback;
+  res.redirect(login_url,next);
+});
+
+server.get('/callback', function (req, res, next) {
+  console.log(req.query);
+  userdata=auth.validateLogin(req.query.ticket,config.auth.login);
+  console.log(userdata);
+  // now check if user is in DB, if not, create it ... then create a session, pass session
+  // ID back to front end so it can store it in local storage and make a falcor model
+  // that binds to the students DB entry
 });
 
 server.get('/model.json', restifyMiddleware(function (req, res, next) {
