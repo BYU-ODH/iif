@@ -8,6 +8,12 @@ var config = {
 	    port:	'35703',
 	    db:	'iif'
     },
+    session_store: {
+      host : "pub-redis-11111.us-central1-1-1.gce.garantiadata.com",
+      port : 11111,
+      db : "iis-sessions",
+      password : "MikeScioscia"
+    },
     server: {
         host: '0.0.0.0',
         port: '8443'

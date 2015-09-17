@@ -6,6 +6,14 @@ var router = require('./router');
 var fs= require('fs');
 var bunyan = require('bunyan');
 var restify = require('restify');
+var session = require('restify-session')({
+  host : config.session_store.host,
+  port : config.session_store.port,
+  db : config.session_store.db,
+  password : config.session_store.password,
+  debug : true,
+  ttl   : 86400
+});
 var restifyMiddleware = require('falcor-restify');
 var falcor = require('falcor');
 var mongoose = require('mongoose');
@@ -45,6 +53,7 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(restify.bodyParser());
 server.use(restify.requestLogger());
 server.use(restify.queryParser());
+server.use(session.sessionManager);
 
 //server.on('after', restify.auditLogger({
 //    log: LOG.child({
