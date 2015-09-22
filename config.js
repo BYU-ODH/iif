@@ -11,7 +11,7 @@ var config = {
     session_store: {
       host : "pub-redis-11111.us-central1-1-1.gce.garantiadata.com",
       port : 11111,
-      db : "iis-sessions",
+      db : 0,
       password : "MikeScioscia"
     },
     server: {

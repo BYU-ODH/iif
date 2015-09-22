@@ -2,7 +2,7 @@ var Router = require('falcor-router');
 var Student = require('./models/student');
 var Application = require('./models/application');
 
-var router = new Router([{
+var routes = new Router([{
   route: "students[{keys}]",
   get: function(pathSet) {
     if (typeof pathSet[1][0] === "undefined") {
@@ -41,4 +41,4 @@ var router = new Router([{
   }
 }]);
 
-module.exports = router;
+module.exports = routes;

@@ -1,21 +1,23 @@
 var env = process.env.NODE_ENV || 'development';
 var config = require('./config')[env];
 var auth = require('./auth');
-var router = require('./router');
+var router = require('./routes');
 
 var fs= require('fs');
 var bunyan = require('bunyan');
 var restify = require('restify');
 var session = require('restify-session')({
-  host : config.session_store.host,
-  port : config.session_store.port,
-  db : config.session_store.db,
-  password : config.session_store.password,
+  connection: {
+    host : config.session_store.host,
+    port : config.session_store.port,
+    db : config.session_store.db,
+    pass : config.session_store.password
+  },
   debug : true,
   ttl   : 86400
 });
-var restifyMiddleware = require('falcor-restify');
 var falcor = require('falcor');
+var restifyMiddleware = require('falcor-restify');
 var mongoose = require('mongoose');
 
 var LOG = bunyan.createLogger({
@@ -25,9 +27,9 @@ var LOG = bunyan.createLogger({
 });
 
 var server = restify.createServer({
-  certificate: fs.readFileSync('/etc/ssl/certs/jmcdonald.crt'),
-  key: fs.readFileSync('/etc/ssl/private/jmcdonald_byu_edu.key'),
-  ca: fs.readFileSync('/etc/ssl/certs/jmcdonald_ca.crt'),
+  //certificate: fs.readFileSync('/etc/ssl/certs/jmcdonald.crt'),
+  //key: fs.readFileSync('/etc/ssl/private/jmcdonald_byu_edu.key'),
+  //ca: fs.readFileSync('/etc/ssl/certs/jmcdonald_ca.crt'),
   log: LOG.child({
     component: 'server',
     level: bunyan.INFO,
@@ -66,9 +68,14 @@ server.on('uncaughtException', function (req, res, route, err) {
 });
 
 server.get('/login', function (req, res, next) {
-  console.log(req.query);
+  console.log(req.query,req.session);
   login_url=auth.cas_server+"?service="+config.auth.login+"&next="+config.auth.callback;
   res.redirect(login_url,next);
+});
+
+server.get('/session', function(req, res, next){
+   res.send({ success: true, session: req.session });
+   return next();
 });
 
 server.get('/callback', function (req, res, next) {
