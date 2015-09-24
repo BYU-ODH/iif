@@ -6,16 +6,7 @@ var router = require('./routes');
 var fs= require('fs');
 var bunyan = require('bunyan');
 var restify = require('restify');
-var session = require('restify-session')({
-  connection: {
-    host : config.session_store.host,
-    port : config.session_store.port,
-    db : config.session_store.db,
-    pass : config.session_store.password
-  },
-  debug : true,
-  ttl   : 86400
-});
+var sessions = require('client-sessions');
 var falcor = require('falcor');
 var restifyMiddleware = require('falcor-restify');
 var mongoose = require('mongoose');
@@ -55,7 +46,12 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(restify.bodyParser());
 server.use(restify.requestLogger());
 server.use(restify.queryParser());
-server.use(session.sessionManager);
+server.use(sessions({
+  cookieName: config.session_store.cookieName,
+  secret: config.session_store.secret,
+  duration: config.session_store.duration,
+  activeDuration: config.session_store.activeDuration
+}));
 
 //server.on('after', restify.auditLogger({
 //    log: LOG.child({
@@ -68,13 +64,13 @@ server.on('uncaughtException', function (req, res, route, err) {
 });
 
 server.get('/login', function (req, res, next) {
-  console.log(req.query,req.session);
+  console.log(req.query,req.iifSession);
   login_url=auth.cas_server+"?service="+config.auth.login+"&next="+config.auth.callback;
   res.redirect(login_url,next);
 });
 
 server.get('/session', function(req, res, next){
-   res.send({ success: true, session: req.session });
+   res.send({ success: true, session: req.iifSession });
    return next();
 });
 

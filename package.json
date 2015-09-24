@@ -15,6 +15,7 @@
   "dependencies": {
     "bunyan": "^1.4.0",
     "byu-cas": "git+https://github.com/jlmcdonald/BYU-CAS-npm",
+    "client-sessions": "^0.7.0",
     "falcor": "^0.1.12",
     "falcor-restify": "^1.1.1",
     "falcor-router": "^0.2.9",

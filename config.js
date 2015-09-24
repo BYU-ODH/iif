@@ -9,10 +9,10 @@ var config = {
 	    db:	'iif'
     },
     session_store: {
-      host : "pub-redis-11111.us-central1-1-1.gce.garantiadata.com",
-      port : 11111,
-      db : 0,
-      password : "MikeScioscia"
+      cookieName: 'iifSession',
+      secret: 'LOFb0yCpRV2EBz26BgfClsBz05jQRJ36',
+      duration: 24 * 60 * 60 * 1000,
+      activeDuration: 1000 * 60 * 5
     },
     server: {
         host: '0.0.0.0',
