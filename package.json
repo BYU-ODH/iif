@@ -6,16 +6,22 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jlmcdonald/iif.git"
+  },
   "author": "Jarom McDonald",
   "license": "MPL 2.0",
   "dependencies": {
     "bunyan": "^1.4.0",
-    "byu-cas": "^1.0.1",
+    "byu-cas": "git+https://github.com/jlmcdonald/BYU-CAS-npm",
+    "client-sessions": "^0.7.0",
     "falcor": "^0.1.12",
     "falcor-restify": "^1.1.1",
     "falcor-router": "^0.2.9",
     "mongoose": "^4.1.7",
     "promised-mongo": "^1.2.0",
-    "restify": "^4.0.0"
+    "restify": "^4.0.0",
+    "restify-session": "^1.1.1"
   }
 }

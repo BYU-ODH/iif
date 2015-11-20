@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 var env = process.env.NODE_ENV || 'development',
     config = require('./config')[env];
 
@@ -19,9 +20,9 @@ var LOG = bunyan.createLogger({
 });
 
 var server = restify.createServer({
-  certificate: fs.readFileSync('/etc/ssl/certs/jmcdonald.crt'),
-  key: fs.readFileSync('/etc/ssl/private/jmcdonald_byu_edu.key'),
-  ca: fs.readFileSync('/etc/ssl/certs/jmcdonald_ca.crt'),
+  //certificate: fs.readFileSync('/etc/ssl/certs/jmcdonald.crt'),
+  //key: fs.readFileSync('/etc/ssl/private/jmcdonald_byu_edu.key'),
+  //ca: fs.readFileSync('/etc/ssl/certs/jmcdonald_ca.crt'),
   log: LOG.child({
     component: 'server',
     level: bunyan.INFO,
@@ -42,11 +43,17 @@ var server = restify.createServer({
 var creds=config.database.user+":"+config.database.passwd;
 var conn_uri='mongodb://'+creds+'@'+config.database.host+':'+config.database.port+'/'+config.database.db;
 var db=mongoose.connect(conn_uri,['students','applications']);
-  
+
 server.use(restify.acceptParser(server.acceptable));
 server.use(restify.bodyParser());
 server.use(restify.requestLogger());
 server.use(restify.queryParser());
+server.use(sessions({
+  cookieName: config.session_store.cookieName,
+  secret: config.session_store.secret,
+  duration: config.session_store.duration,
+  activeDuration: config.session_store.activeDuration
+}));
 
 server.use(sessions({
   secret: 'IEde0cdseJRi2o4hTW8q11u33J807S8q',
