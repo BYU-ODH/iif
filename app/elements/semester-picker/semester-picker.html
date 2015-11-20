@@ -1,0 +1,65 @@
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+
+<dom-module id="semester-picker">
+  <template>
+    <paper-dropdown-menu label="Semester" name="semester" required="{{required}}">
+      <paper-menu class="dropdown-content" id="semesteroptions" attr-for-selected="value" selected="{{numericSemester}}">
+        <template is="dom-repeat" items="{{_semesters}}">
+          <paper-item value="{{item.value}}">{{item.label}}</paper-item>
+        </template>
+      </paper-menu>
+    </paper-dropdown-menu>
+    <paper-dropdown-menu label="Year" name="year" required="{{required}}">
+      <paper-menu class="dropdown-content" id="yearoptions">
+        <template is="dom-repeat" items="{{_years}}">
+          <paper-item>{{item}}</paper-item>
+        </template>
+      </paper-menu>
+    </paper-dropdown-menu>
+  </template>
+  <script>
+    Polymer({
+      is: 'semester-picker',
+      properties: {
+        trimester: {
+          type: String,
+          value: ""
+        },
+        required: {
+          type: Boolean,
+          value: false
+        },
+        semester: {
+          type: Number,
+          value: 5
+        },
+        year: {
+          type: Number,
+          value: 2015
+        }
+      },
+      ready: function() {
+        this._years = [];
+        this._semesters = [{"label":"Winter","value":1},{"label":"Fall","value":5}]
+        var d = new Date(),
+            n = d.getFullYear();
+        [n,(n+1)].forEach(function(v,k) {
+          this.push('_years', v);
+        }.bind(this));
+        
+        if (this.trimester!=="") {
+          if (this.trimester==="breakable") {
+            this.push('_semesters',{"label":"Spring and/or Summer","value":7});
+          }
+          else {
+            this.push('_semesters',{"label":"Spring and Summer","value":7});
+          }
+        }
+        else {
+          this.push('_semesters',{"label":"Spring","value":3});
+          this.push('_semesters',{"label":"Summer","value":4});
+        }
+      }
+    });
+  </script>
+</dom-module>

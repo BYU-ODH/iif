@@ -1,15 +1,16 @@
-var env = process.env.NODE_ENV || 'development';
-var config = require('./config')[env];
-var fs= require('fs');
-var bunyan = require('bunyan');
-var restify = require('restify');
-var restifyMiddleware = require('falcor-restify');
-var falcor = require('falcor');
-var mongoose = require('mongoose');
-var Router = require('falcor-router');
-var cas = require('byu-cas');
-var Student = require('./models/student');
-var Application = require('./models/application');
+var env = process.env.NODE_ENV || 'development',
+    config = require('./config')[env];
+
+var fs= require('fs'),
+    bunyan = require('bunyan'),
+    restify = require('restify'),
+    mongoose = require('mongoose'),
+    sessions = require('client-sessions'),
+    controllers = {
+      session: require('./controllers/session'),
+      auth: require('./controllers/auth'),
+      application: require('./controllers/application')
+    };
 
 var LOG = bunyan.createLogger({
     name: 'demo',
@@ -42,64 +43,15 @@ var creds=config.database.user+":"+config.database.passwd;
 var conn_uri='mongodb://'+creds+'@'+config.database.host+':'+config.database.port+'/'+config.database.db;
 var db=mongoose.connect(conn_uri,['students','applications']);
   
-var router = new Router([{
-  route: "credentials[{keys}]",
-  get: function(pathSet) {
-    return cas.getTicket(pathSet[1],pathSet[2], config.url)
-    .then(function(ticket){
-      return cas.validate(ticket, config.url);
-    })
-    .then(function success(response) {
-      return {"path":[response.username],"value":response.attributes};
-    })
-    .catch(function error(e) {
-      console.log("Invalid ticket. Error message was: " + e.message);
-    });
-  }
-},
-{
-  route: "students[{keys}]",
-  get: function(pathSet) {
-    if (typeof pathSet[1][0] === "undefined") {
-      return Student.find().exec().then(function(documents) {
-        return {"path":["students"],"value":JSON.stringify(documents)};
-      });
-    }
-    else {
-      return Student.find({ 'netid': {$in: pathSet[1] }}).exec().then(function(documents) {
-        var results=[];
-        documents.forEach(function(document) {
-          results.push({"path":[pathSet[0],document.netid],"value":JSON.stringify(document)});
-        });
-        return results;
-      });
-    }
-  }
-},
-{
-  route: "applications[{keys}]",
-  get: function(pathSet) {
-    if (typeof pathSet[1][0] === "undefined") {
-      return Application.find().exec().then(function(documents) {
-        return {"path":["applications"],"value":JSON.stringify(documents)};
-      });
-    }
-    else {
-      return Application.find({ 'netid': {$in: pathSet[1] }}).exec().then(function(documents) {
-        var results=[];
-        documents.forEach(function(document) {
-          results.push({"path":[pathSet[0],document.netid],"value":JSON.stringify(document)});
-        });
-        return results;
-      });
-    }
-  }
-}]);
-
 server.use(restify.acceptParser(server.acceptable));
 server.use(restify.bodyParser());
 server.use(restify.requestLogger());
 server.use(restify.queryParser());
+
+server.use(sessions({
+  secret: 'IEde0cdseJRi2o4hTW8q11u33J807S8q',
+  duration: 2 * 60 * 60 * 1000
+}));
 
 //server.on('after', restify.auditLogger({
 //    log: LOG.child({
@@ -111,16 +63,16 @@ server.on('uncaughtException', function (req, res, route, err) {
   req.log.error(err, 'got uncaught exception');
 });
 
-server.get('/login', function (req, res, next) {
-  auth.doCasLogin();
-});
+server.get('/login', controllers.auth.loginFlow);
 
-server.get('/model.json', restifyMiddleware(function (req, res, next) {
-  return router;
-}));
+server.get("/sessions",controllers.session.getSession);
+server.post("/sessions",controllers.session.createSession);
+server.del("/sessions",controllers.session.removeSession);
+
+server.post("/applications",controllers.application.createApplication);
 
 server.get(/\/.*/, restify.serveStatic({
-  directory: __dirname,
+  directory:'app',
   default: 'index.html'
 }));
 

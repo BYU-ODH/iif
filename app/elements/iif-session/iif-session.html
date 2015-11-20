@@ -1,0 +1,112 @@
+<link href="../../bower_components/iron-icons/iron-icons.html" rel="import"/>
+<link href="../../bower_components/iron-icon/iron-icon.html" rel="import"/>
+<link href="../../bower_components/iron-ajax/iron-ajax.html" rel="import"/>
+<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link href="../semester-picker/semester-picker.html" rel="import"/>
+<dom-module id="iif-session">
+  <template>
+    <iron-ajax id="sessioneer" auto url="/sessions" content-type="application/json" handle-as="json" debounce-duration="300" method="get" on-response="initializeStudent"></iron-ajax>
+    <iron-ajax id="appMan" url="/applications" handle-as="json" debounce-duration="300" method="post"></iron-ajax>
+    <div hidden$="{{studentExists(netid)}}">
+      <p>If you're interested in being considered for funding for your upcoming international internship, please sign in and complete the short form.</p>
+      <paper-button raised on-click="startLoginFlow">
+        <iron-icon icon="perm-identity"></iron-icon> Sign in
+      </paper-button>
+    </div>
+    <div hidden$="{{loggedOut(netid)}}">
+      <p>Your name: <span>{{student.name}}</span></p>
+      <form is="iron-form" id="iifform" method="post" action="#">
+        <paper-dropdown-menu label="Internship program" name="program" required>
+          <paper-menu class="dropdown-content" id="programoptions">
+            <template is="dom-repeat" items="{{_programs}}">
+              <paper-item>{{item}}</paper-item>
+            </template>
+          </paper-menu>
+        </paper-dropdown-menu>
+        <paper-input size="25" name="coordinator_name" label="Program coordinator's name" required></paper-input><br/>
+        <paper-input size="25" name="coordinator_email" label="Program coordinator's email address" required></paper-input><br/>
+        <semester-picker trimester="breakable" required id="appSemester"></semester-picker><br/><br/>
+        <paper-toggle-button name="permission" active></paper-toggle-button> I grant permission to BYU's College of Humanities to access information and records pertinent to my application for funding, in order to determine eligibility and to enable demographic analysis<br/>(Any identifying information will remain anonymous)<br/><br/><br/>
+        <paper-button raised on-click="submitForm">Submit Funding Request</paper-button><span hidden$="{{armedForSubmission}}"><paper-spinner alt="Saving Application" active></paper-spinner> <span>saving application ...</span></span>
+      </form>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is: 'iif-session',
+      properties: {
+        netid: {
+          type: String,
+          value: ""
+        },
+        student: {
+          type: Object
+        },
+        armedForSubmission: {
+          type: Boolean,
+          value: true
+        }
+      },
+      initializeStudent: function(event) {
+        if ("netid" in event.detail.response) {
+          this.netid = event.detail.response.netid;
+          this.student = event.detail.response.useratts;
+        }
+      },
+      toggleSpinner: function() {
+        this.armedForSubmission=!this.armedForSubmission;
+      },
+      studentExists: function() {
+        return this.netid!=="";
+      },
+      loggedOut: function() {
+        return this.netid==="";
+      },
+      startLoginFlow: function() {
+        page("/login");
+      },
+      submitForm: function() {
+        if (this.$.iifform.validate()) {
+          this.toggleSpinner();
+          var submission=this.$.iifform.serialize();
+          submission.numericSemester=this.$.appSemester.numericSemester;
+          submission.permission=(submission.permission==="on") ? true : false;
+          this.$.appMan.body=JSON.stringify(submission);
+          this.$.appMan.generateRequest();
+        }
+      },
+      ready: function() {
+        this._programs=[
+          "Women's Studies",
+          "TESOL",
+          "Spanish",
+          "Slavic and Eastern European",
+          "Scandinavian",
+          "Russian",
+          "Portuguese",
+          "Philosophy",
+          "Middle-Eastern",
+          "Linguistics",
+          "Latin American Studies",
+          "Korea",
+          "Japan",
+          "Italy",
+          "German",
+          "French",
+          "European Studies",
+          "English",
+          "Editing",
+          "Digital Humanities and Technology",
+          "Comparative Arts and Letters",
+          "Chinese",
+          "American Studies"
+        ];
+        this._programs.sort();
+      }
+    });
+  </script>
+</dom-module>

@@ -2,10 +2,13 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var applicationSchema = new Schema({
-  netid: String,
-  _id: { type: String, required: true, unique: true },
-  isp: Boolean,
-  coordinator: String
+  coordinator_email: String,
+  coordinator_name: String,
+  numericSemester: Number,
+  permission: Boolean,
+  program: String,
+  semester: String,
+  year: Number
 });
 
 var Application = mongoose.model('application', applicationSchema);

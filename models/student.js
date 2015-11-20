@@ -2,12 +2,12 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var studentSchema = new Schema({
-  name: String,
-  _id: { type: String, required: true, unique: true },
+  token: String,
+  fullname: String,
   netid: { type: String, required: true, unique: true },
-  admin: Boolean,
-  created_at: Date,
-  updated_at: Date
+  admin: {type: Boolean, default: false},
+  created_at: {type: Date, default: Date.now},
+  updated_at: {type: Date, default: Date.now}
 });
 
 var Student = mongoose.model('student', studentSchema);
