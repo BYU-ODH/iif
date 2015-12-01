@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-var env = process.env.NODE_ENV || 'development',
+var env = process.env.NODE_ENV || 'production',
     config = require('./config')[env];
 
 var fs= require('fs'),
@@ -83,6 +82,6 @@ server.get(/\/.*/, restify.serveStatic({
   default: 'index.html'
 }));
 
-server.listen(config.server.port,function() {
+server.listen(config.server.port,config.server.host,function() {
   LOG.info("Server started on port %s",config.server.port);
 });

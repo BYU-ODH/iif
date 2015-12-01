@@ -1,23 +1,19 @@
-var Application = require("../models/Application");
+var Application = require("../models/application");
     
 exports.createApplication = function(req, res, next) {
   if (req.session_state.netid) {
-  var packet=JSON.parse(req.body);
+    var packet=JSON.parse(req.body);
     packet.netid = req.session_state.netid;
-    var app = new Application(JSON.parse(req.body));
-    app.save(function(err, app) {
-        if (err) {
-            res.status(500);
-            res.json({
-                type: false,
-                data: "Error occurred: " + err
-            });
-        } else {
-            res.json({
-                type: true,
-                data: app
-            });
-        }
+    packet.fullname = req.session_state.student.fullname;
+    var app = new Application(packet);
+    app.save().then(function() {
+      console.log('yoder');
+      res.json({
+        type: true,
+        data: "yes"
+      });
+    }, function(err) {
+      console.log('could not save application: '+err);
     });
   }
   else {

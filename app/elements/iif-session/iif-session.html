@@ -10,7 +10,7 @@
 <dom-module id="iif-session">
   <template>
     <iron-ajax id="sessioneer" auto url="/sessions" content-type="application/json" handle-as="json" debounce-duration="300" method="get" on-response="initializeStudent"></iron-ajax>
-    <iron-ajax id="appMan" url="/applications" handle-as="json" debounce-duration="300" method="post"></iron-ajax>
+    <iron-ajax id="appMan" url="/applications" handle-as="json" debounce-duration="300" method="post" on-response="appConfirmed"></iron-ajax>
     <div hidden$="{{studentExists(netid)}}">
       <p>If you're interested in being considered for funding for your upcoming international internship, please sign in and complete the short form.</p>
       <paper-button raised on-click="startLoginFlow">
@@ -18,7 +18,7 @@
       </paper-button>
     </div>
     <div hidden$="{{loggedOut(netid)}}">
-      <p>Your name: <span>{{student.name}}</span></p>
+      <p>Your name: <span>{{student.fullname}}</span></p>
       <form is="iron-form" id="iifform" method="post" action="#">
         <paper-dropdown-menu label="Internship program" name="program" required>
           <paper-menu class="dropdown-content" id="programoptions">
@@ -52,9 +52,10 @@
         }
       },
       initializeStudent: function(event) {
+        console.log(event.detail.response);
         if ("netid" in event.detail.response) {
           this.netid = event.detail.response.netid;
-          this.student = event.detail.response.useratts;
+          this.student = event.detail.response.student;
         }
       },
       toggleSpinner: function() {
@@ -79,17 +80,24 @@
           this.$.appMan.generateRequest();
         }
       },
+      appConfirmed: function(event) {
+        this.toggleSpinner();
+        this.$.iifform.reset();
+        page("/confirmed");
+      },
       ready: function() {
         this._programs=[
           "Women's Studies",
+          "Washington Seminar",
           "TESOL",
           "Spanish",
           "Slavic and Eastern European",
-          "Scandinavian",
+          "Scandinavian Studies",
           "Russian",
+          "Rhetoric/Writing",
           "Portuguese",
           "Philosophy",
-          "Middle-Eastern",
+          "On-Campus Internship",
           "Linguistics",
           "Latin American Studies",
           "Korea",
@@ -102,7 +110,11 @@
           "Editing",
           "Digital Humanities and Technology",
           "Comparative Arts and Letters",
+          "Chinese Flagship",
           "Chinese",
+          "Asian/Near Eastern Languages",
+          "Art History",
+          "Arabic/MESA",
           "American Studies"
         ];
         this._programs.sort();
