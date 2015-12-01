@@ -1,6 +1,9 @@
 const CAS_SERVICE="https://cas.byu.edu/cas/";
+var env = process.env.NODE_ENV || 'production',
+    config = require('../config')[env];
+
 var cas = require('byu-cas'),
-    Student = require("../models/Student");
+    Student = require("../models/student");
 
 var locateStudent = function(token,netid,name) {
   query = Student.where({"netid":netid});
@@ -18,7 +21,7 @@ var locateStudent = function(token,netid,name) {
 exports.loginFlow = function (req, res, next) {
   var cas_function="login",
       n=encodeURIComponent("/"),
-      service="https://jmcdonald.byu.edu:8443/login?next="+n;
+      service=config.url+"/login?next="+n;
   if (req.session_state.netid) {
     if (!("student" in req.session_state)) {
       locateStudent(req.session_state.id,req.session_state.netid,"noname").then(function(student) {

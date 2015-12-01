@@ -1,4 +1,4 @@
-var env = process.env.NODE_ENV || 'development',
+var env = process.env.NODE_ENV || 'production',
     config = require('./config')[env];
 
 var fs= require('fs'),
@@ -19,9 +19,9 @@ var LOG = bunyan.createLogger({
 });
 
 var server = restify.createServer({
-  certificate: fs.readFileSync('/etc/ssl/certs/jmcdonald.crt'),
-  key: fs.readFileSync('/etc/ssl/private/jmcdonald_byu_edu.key'),
-  ca: fs.readFileSync('/etc/ssl/certs/jmcdonald_ca.crt'),
+  certificate: config.server.certificate,
+  key: config.server.key,
+  ca: config.server.ca,
   log: LOG.child({
     component: 'server',
     level: bunyan.INFO,
@@ -76,6 +76,6 @@ server.get(/\/.*/, restify.serveStatic({
   default: 'index.html'
 }));
 
-server.listen(config.server.port,function() {
+server.listen(config.server.port,config.server.host,function() {
   LOG.info("Server started on port %s",config.server.port);
 });

@@ -1,4 +1,4 @@
-var Application = require("../models/Application");
+var Application = require("../models/application");
     
 exports.createApplication = function(req, res, next) {
   if (req.session_state.netid) {
