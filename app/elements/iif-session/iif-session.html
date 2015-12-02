@@ -20,6 +20,13 @@
     <div hidden$="{{loggedOut(netid)}}">
       <p>Your name: <span>{{student.fullname}}</span></p>
       <form is="iron-form" id="iifform" method="post" action="#">
+        <paper-dropdown-menu label="Internship location" name="location" required>
+          <paper-menu class="dropdown-content" id="locationoptions">
+            <template is="dom-repeat" items="{{_locations}}">
+              <paper-item>{{item}}</paper-item>
+            </template>
+          </paper-menu>
+        </paper-dropdown-menu>
         <paper-dropdown-menu label="Internship program" name="program" required>
           <paper-menu class="dropdown-content" id="programoptions">
             <template is="dom-repeat" items="{{_programs}}">
@@ -27,9 +34,11 @@
             </template>
           </paper-menu>
         </paper-dropdown-menu>
+        <paper-input size="25" name="venue" label="Internship venue" required></paper-input><br/>(Enter either the company/organizational name, or the city/country)<br/><br/>
         <paper-input size="25" name="coordinator_name" label="Program coordinator's name" required></paper-input><br/>
-        <paper-input size="25" name="coordinator_email" label="Program coordinator's email address" required></paper-input><br/>
+        <paper-input size="25" name="coordinator_email" label="Program coordinator's email address" required></paper-input><br/><br/><br/>
         <semester-picker trimester="breakable" required id="appSemester"></semester-picker><br/><br/>
+        <paper-toggle-button name="unpaid" active></paper-toggle-button> I certify that the internship I will be engaged in is unpaid<br/>
         <paper-toggle-button name="permission" active></paper-toggle-button> I grant permission to BYU's College of Humanities to access information and records pertinent to my application for funding, in order to determine eligibility and to enable demographic analysis<br/>(Any identifying information will remain anonymous)<br/><br/><br/>
         <paper-button raised on-click="submitForm">Submit Funding Request</paper-button><span hidden$="{{armedForSubmission}}"><paper-spinner alt="Saving Application" active></paper-spinner> <span>saving application ...</span></span>
       </form>
@@ -86,6 +95,11 @@
         page("/confirmed");
       },
       ready: function() {
+        this._locations=[
+          "Domestic (in Utah)",
+          "Domestic (outside of Utah)",
+          "International"
+        ];
         this._programs=[
           "Women's Studies",
           "Washington Seminar",

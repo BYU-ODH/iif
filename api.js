@@ -1,5 +1,5 @@
-var env = process.env.NODE_ENV || 'production',
-    config = require('./config')[env];
+var env = process.env.NODE_ENV || 'development',
+    config = require('./config.local')[env];
 
 var fs= require('fs'),
     bunyan = require('bunyan'),
@@ -19,9 +19,9 @@ var LOG = bunyan.createLogger({
 });
 
 var server = restify.createServer({
-  //certificate: fs.readFileSync('/etc/ssl/certs/jmcdonald.crt'),
-  //key: fs.readFileSync('/etc/ssl/private/jmcdonald_byu_edu.key'),
-  //ca: fs.readFileSync('/etc/ssl/certs/jmcdonald_ca.crt'),
+  certificate: config.server.certificate,
+  key: config.server.key,
+  ca: config.server.ca,
   log: LOG.child({
     component: 'server',
     level: bunyan.INFO,
