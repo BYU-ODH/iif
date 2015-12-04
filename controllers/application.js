@@ -56,8 +56,8 @@ exports.createApplication = function(req, res, next) {
         packet.gpa=records_obj.RecMainService.response['Credit List'][0].gpa;
         var app = new Application(packet);
         confmessage="An application for internship funding for the BYU college of Humanities was recently submitted. Here are the details.\n\n";
-        for (att in packet) {
-          confmessage=att+": "+packet[att]+"\n";
+        for (var att in packet) {
+          confmessage+=att+": "+packet[att]+"\n";
         }
         confmessage+="\nIf you have any questions, please contact Humanities Advisement and Careers (1175 JFSB, 801.422.4789, humanities-advisement@byu.edu)";
         app.save().then(function() {

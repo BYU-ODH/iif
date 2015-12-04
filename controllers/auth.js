@@ -39,7 +39,6 @@ exports.loginFlow = function (req, res, next) {
   }
   else if (req.query.ticket) {
     cas.validate(req.query.ticket, service).then(function success(response) {
-      console.log(response.attributes);
       req.session_state.netid=response.username;
       locateStudent(req.session_state.id,response.username,response.attributes.name,response.attributes.personId,response.attributes.emailAddress).then(function(student) {
         req.session_state.student=student;
