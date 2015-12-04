@@ -31,8 +31,7 @@ exports.createApplication = function(req, res, next) {
   if (req.session_state.netid) {
     var transporter = nodemailer.createTransport(sendmailTransport()),
         packet=JSON.parse(req.body);
-        packet.courses="";
-        packet.major="";
+        
     getStudentData("RecMainService",req.session_state.student.personid.toString(),req.session_state.netid,"grants").then(function(records) {
       numsem = (parseInt(packet.numericSemester)===7) ? "4" : packet.numericSemester.toString();
       getStudentData("WeeklySchedService",req.session_state.student.personid.toString()+"/"+packet.year.toString()+numsem,req.session_state.netid,"humanities").then(function(schedule) {
@@ -43,6 +42,8 @@ exports.createApplication = function(req, res, next) {
           confmessage+=att+": "+packet[att]+"\n";
         }
         confmessage+="\nIf you have any questions, please contact Humanities Advisement and Careers (1175 JFSB, 801.422.4789, humanities-advisement@byu.edu)";
+        packet.courses="";
+        packet.major="";
 
         schedule_obj=JSON.parse(schedule.body);
         schedule_obj.WeeklySchedService.response.schedule_table.forEach(function(course,idx) {
