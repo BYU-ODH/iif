@@ -36,6 +36,14 @@ exports.createApplication = function(req, res, next) {
     getStudentData("RecMainService",req.session_state.student.personid.toString(),req.session_state.netid,"grants").then(function(records) {
       numsem = (parseInt(packet.numericSemester)===7) ? "4" : packet.numericSemester.toString();
       getStudentData("WeeklySchedService",req.session_state.student.personid.toString()+"/"+packet.year.toString()+numsem,req.session_state.netid,"humanities").then(function(schedule) {
+        packet.netid = req.session_state.netid;
+        packet.fullname = req.session_state.student.fullname;
+        confmessage="An application for internship funding for the BYU college of Humanities was recently submitted. Here are the details.\n\n";
+        for (var att in packet) {
+          confmessage+=att+": "+packet[att]+"\n";
+        }
+        confmessage+="\nIf you have any questions, please contact Humanities Advisement and Careers (1175 JFSB, 801.422.4789, humanities-advisement@byu.edu)";
+
         schedule_obj=JSON.parse(schedule.body);
         schedule_obj.WeeklySchedService.response.schedule_table.forEach(function(course,idx) {
           if (packet.courses!=="") {
@@ -43,23 +51,18 @@ exports.createApplication = function(req, res, next) {
           }
           packet.courses+=course.course;
         });
-        packet.netid = req.session_state.netid;
-        packet.fullname = req.session_state.student.fullname;
+        
         records_obj=JSON.parse(records.body.replace("data list is missing ending delimiter",""));
-        packet.classStanding=records_obj.RecMainService.response.classStanding;
         records_obj.RecMainService.response.Major.forEach(function(m,idx) {
           if (packet.major!=="") {
             packet.major+=",";
           }
           packet.major+=m.department+" "+m.type;
         });
+        packet.classStanding=records_obj.RecMainService.response.classStanding;
         packet.gpa=records_obj.RecMainService.response['Credit List'][0].gpa;
+        
         var app = new Application(packet);
-        confmessage="An application for internship funding for the BYU college of Humanities was recently submitted. Here are the details.\n\n";
-        for (var att in packet) {
-          confmessage+=att+": "+packet[att]+"\n";
-        }
-        confmessage+="\nIf you have any questions, please contact Humanities Advisement and Careers (1175 JFSB, 801.422.4789, humanities-advisement@byu.edu)";
         app.save().then(function() {
           recipients=['"'+config.notifications.approver.name+'" <'+config.notifications.approver.email+'>','"'+req.session_state.student.fullname+'" <'+req.session_state.student.email+'>'];
           recipients.forEach(function(recipient,idx) {
