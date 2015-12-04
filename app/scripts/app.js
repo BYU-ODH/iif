@@ -62,5 +62,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       drawerPanel.closeDrawer();
     }
   };
+  
+  app.startLogoutFlow = function() {
+    page("/logout");
+  };
 
 })(document);

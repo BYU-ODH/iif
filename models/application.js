@@ -14,6 +14,10 @@ var applicationSchema = new Schema({
   year: {type: Number, required: true},
   netid: {type: String, required: true},
   fullname: String,
+  major: String,
+  classStanding: String,
+  gpa: String,
+  courses: String,
   created_at: {type: Date, default: Date.now},
 });
 

@@ -92,6 +92,7 @@
       appConfirmed: function(event) {
         this.toggleSpinner();
         this.$.iifform.reset();
+        window.scrollTo(0,0);
         page("/confirmed");
       },
       ready: function() {

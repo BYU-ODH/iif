@@ -70,6 +70,8 @@ server.on('uncaughtException', function (req, res, route, err) {
 });
 
 server.get('/login', controllers.auth.loginFlow);
+server.get('/logout', controllers.auth.logoutFlow);
+
 
 server.get("/sessions",controllers.session.getSession);
 server.post("/sessions",controllers.session.createSession);

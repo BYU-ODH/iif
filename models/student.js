@@ -6,6 +6,8 @@ var studentSchema = new Schema({
   fullname: String,
   netid: { type: String, required: true, unique: true },
   admin: {type: Boolean, default: false},
+  email: {type: String},
+  personid: {type: Number, required: true },
   created_at: {type: Date, default: Date.now},
   updated_at: {type: Date, default: Date.now}
 });

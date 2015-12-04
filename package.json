@@ -16,9 +16,13 @@
     "bunyan": "^1.4.0",
     "byu-cas": "git+https://github.com/jlmcdonald/BYU-CAS-npm",
     "client-sessions": "^0.7.0",
+    "fs-extra-promise": "^0.3.1",
+    "moment": "^2.10.6",
     "mongoose": "^4.1.7",
     "nodemailer": "^1.10.0",
     "nodemailer-sendmail-transport": "^1.0.0",
-    "restify": "^4.0.0"
+    "request-promise": "^1.0.2",
+    "restify": "^4.0.0",
+    "xml2js": "^0.4.15"
   }
 }

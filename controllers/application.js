@@ -3,29 +3,81 @@ var env = process.env.NODE_ENV || 'development',
 
 var Application = require("../models/application"),
     nodemailer = require('nodemailer'),
-    sendmailTransport = require('nodemailer-sendmail-transport');
+    sendmailTransport = require('nodemailer-sendmail-transport'),
+    ws_client = require ("../modules/byu-ws"),
+    request = require("request-promise");
 
-var transporter = nodemailer.createTransport(sendmailTransport());
+var serviceMap = {
+  "RecMainService": "https://api.byu.edu/rest/v1/apikey/academic/records/studentrecord/",
+  "WeeklySchedService" : "https://ws.byu.edu/rest/v1.0/academic/registration/studentschedule/"
+};
+
+getStudentData = function(service,param,netid,creds_id) {
+  serviceURL = serviceMap[service]+param;
+  return ws_client.get_http_authorization_header(config.BYU_credentials[creds_id].key, config.BYU_credentials[creds_id].secret, ws_client.KEY_TYPE_API, ws_client.ENCODING_NONCE, serviceURL, "",netid,"application/json",ws_client.HTTP_METHOD_GET,true).then(function(headerVal) {
+    var options = {
+      method: 'GET',
+      uri: serviceURL,
+      headers: {
+        "Authorization": headerVal
+      },
+      resolveWithFullResponse: true
+    };
+    return request(options);
+  });
+};
     
 exports.createApplication = function(req, res, next) {
   if (req.session_state.netid) {
-    var packet=JSON.parse(req.body);
-    packet.netid = req.session_state.netid;
-    packet.fullname = req.session_state.student.fullname;
-    var app = new Application(packet);
-    app.save().then(function() {
-      transporter.sendMail({
-        from: '"Humanities Internship Funding System" <humplus-funding@byu.edu>',
-        to: '"'+config.notifications.approver.name+'" <'+config.notifications.approver.email+'>',
-        subject: 'New Internship Funding Request',
-        text: JSON.stringify(packet)
+    var transporter = nodemailer.createTransport(sendmailTransport()),
+        packet=JSON.parse(req.body);
+        packet.courses="";
+        packet.major="";
+    getStudentData("RecMainService",req.session_state.student.personid.toString(),req.session_state.netid,"grants").then(function(records) {
+      numsem = (parseInt(packet.numericSemester)===7) ? "4" : packet.numericSemester.toString();
+      getStudentData("WeeklySchedService",req.session_state.student.personid.toString()+"/"+packet.year.toString()+numsem,req.session_state.netid,"humanities").then(function(schedule) {
+        schedule_obj=JSON.parse(schedule.body);
+        schedule_obj.WeeklySchedService.response.schedule_table.forEach(function(course,idx) {
+          if (packet.courses!=="") {
+            packet.courses+=",";
+          }
+          packet.courses+=course.course;
+        });
+        packet.netid = req.session_state.netid;
+        packet.fullname = req.session_state.student.fullname;
+        records_obj=JSON.parse(records.body.replace("data list is missing ending delimiter",""));
+        packet.classStanding=records_obj.RecMainService.response.classStanding;
+        records_obj.RecMainService.response.Major.forEach(function(m,idx) {
+          if (packet.major!=="") {
+            packet.major+=",";
+          }
+          packet.major+=m.department+" "+m.type;
+        });
+        packet.gpa=records_obj.RecMainService.response['Credit List'][0].gpa;
+        var app = new Application(packet);
+        confmessage="An application for internship funding for the BYU college of Humanities was recently submitted. Here are the details.\n\n";
+        for (att in packet) {
+          confmessage=att+": "+packet[att]+"\n";
+        }
+        confmessage+="\nIf you have any questions, please contact Humanities Advisement and Careers (1175 JFSB, 801.422.4789, humanities-advisement@byu.edu)";
+        app.save().then(function() {
+          recipients=['"'+config.notifications.approver.name+'" <'+config.notifications.approver.email+'>','"'+req.session_state.student.fullname+'" <'+req.session_state.student.email+'>'];
+          recipients.forEach(function(recipient,idx) {
+            transporter.sendMail({
+              from: '"Humanities Internship Funding System" <humplus-funding@byu.edu>',
+              to: recipient,
+              subject: 'New Student Internship Funding Request',
+              text: confmessage
+            });
+          });
+          res.json({
+            type: true,
+            data: "yes"
+          });
+        }, function(err) {
+          console.log('could not save application: '+err);
+        });
       });
-      res.json({
-        type: true,
-        data: "yes"
-      });
-    }, function(err) {
-      console.log('could not save application: '+err);
     });
   }
   else {
