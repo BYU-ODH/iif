@@ -58,7 +58,10 @@ exports.createApplication = function(req, res, next) {
           if (packet.major!=="") {
             packet.major+=",";
           }
-          packet.major+=m.department+" "+m.type;
+          packet.major+=m.department;
+          if (m.type!=="null") {
+            packet.major+=" "+m.type;
+          }
         });
         packet.classStanding=records_obj.RecMainService.response.classStanding;
         packet.gpa=records_obj.RecMainService.response['Credit List'][0].gpa;
