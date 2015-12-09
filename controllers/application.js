@@ -70,6 +70,12 @@ exports.createApplication = function(req, res, next) {
         app.save().then(function() {
           recipients=['"'+config.notifications.approver.name+'" <'+config.notifications.approver.email+'>','"'+req.session_state.student.fullname+'" <'+req.session_state.student.email+'>'];
           recipients.forEach(function(recipient,idx) {
+            if (idx===0) {
+              confmessage="An application for internship funding for the BYU college of Humanities was recently submitted. Here are the details.\n\n";
+              for (var att in packet) {
+                confmessage+=att+": "+packet[att]+"\n";
+              }
+            }
             transporter.sendMail({
               from: '"Humanities Internship Funding System" <humplus-funding@byu.edu>',
               to: recipient,
