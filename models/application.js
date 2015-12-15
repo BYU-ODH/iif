@@ -6,6 +6,8 @@ var applicationSchema = new Schema({
   coordinator_name: {type: String, required: true},
   numericSemester: {type: Number, required: true},
   permission: Boolean,
+  spokenToCoordinator: Boolean,
+  prepCourse: Boolean,
   unpaid: Boolean,
   program: {type: String, required: true},
   venue: {type: String, required: true},
