@@ -26,16 +26,17 @@ getStudentData = function(service,param,netid,creds_id) {
     return request(options);
   });
 };
-    
+
 exports.createApplication = function(req, res, next) {
   if (req.session_state.netid) {
     var transporter = nodemailer.createTransport(sendmailTransport()),
         packet=JSON.parse(req.body);
-        
+
     getStudentData("RecMainService",req.session_state.student.personid.toString(),req.session_state.netid,"grants").then(function(records) {
       numsem = (parseInt(packet.numericSemester)===7) ? "4" : packet.numericSemester.toString();
       getStudentData("WeeklySchedService",req.session_state.student.personid.toString()+"/"+packet.year.toString()+numsem,req.session_state.netid,"humanities").then(function(schedule) {
         packet.netid = req.session_state.netid;
+        packet.byuid = req.session_state.byuid;
         packet.fullname = req.session_state.student.fullname;
         confmessage="An application for internship funding for the BYU college of Humanities was recently submitted. Here are the details.\n\n";
         for (var att in packet) {
@@ -52,7 +53,7 @@ exports.createApplication = function(req, res, next) {
           }
           packet.courses+=course.course;
         });
-        
+
         records_obj=JSON.parse(records.body.replace("data list is missing ending delimiter",""));
         records_obj.RecMainService.response.Major.forEach(function(m,idx) {
           if (packet.major!=="") {
@@ -65,7 +66,7 @@ exports.createApplication = function(req, res, next) {
         });
         packet.classStanding=records_obj.RecMainService.response.classStanding;
         packet.gpa=records_obj.RecMainService.response['Credit List'][0].gpa;
-        
+
         var app = new Application(packet);
         app.save().then(function() {
           recipients=['"'+config.notifications.approver.name+'" <'+config.notifications.approver.email+'>','"'+req.session_state.student.fullname+'" <'+req.session_state.student.email+'>'];

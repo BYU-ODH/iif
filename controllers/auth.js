@@ -5,7 +5,7 @@ var env = process.env.NODE_ENV || 'development',
 var cas = require('byu-cas'),
     Student = require("../models/student");
 
-var locateStudent = function(token,netid,name,personid,email) {
+var locateStudent = function(token,netid,name,personid,email,byuid) {
   query = Student.where({"netid":netid});
   return query.findOne().then(function(student) {
     if (student) {
@@ -16,7 +16,7 @@ var locateStudent = function(token,netid,name,personid,email) {
       return student;
     }
     else {
-      student = new Student({"token":token,"netid":netid,"fullname":name,"personid":personid,"email":email});
+      student = new Student({"token":token,"netid":netid,"fullname":name,"personid":personid,"email":email,"byuid":byuid});
       return student.save();
     }
   });
@@ -40,7 +40,7 @@ exports.loginFlow = function (req, res, next) {
   else if (req.query.ticket) {
     cas.validate(req.query.ticket, service).then(function success(response) {
       req.session_state.netid=response.username;
-      locateStudent(req.session_state.id,response.username,response.attributes.name,response.attributes.personId,response.attributes.emailAddress).then(function(student) {
+      locateStudent(req.session_state.id,response.username,response.attributes.name,response.attributes.personId,response.attributes.emailAddress,response.attributes.byuId).then(function(student) {
         req.session_state.student=student;
         res.redirect(req.query.next, next);
       });
