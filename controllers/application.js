@@ -38,6 +38,7 @@ exports.createApplication = function(req, res, next) {
         packet.netid = req.session_state.netid;
         packet.byuid = req.session_state.byuid;
         packet.fullname = req.session_state.student.fullname;
+        packet.email = req.session_state.student.email;
         confmessage="An application for internship funding for the BYU college of Humanities was recently submitted. Here are the details.\n\n";
         for (var att in packet) {
           confmessage+=att+": "+packet[att]+"\n";
