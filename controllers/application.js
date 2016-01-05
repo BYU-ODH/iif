@@ -14,7 +14,7 @@ var serviceMap = {
 
 getStudentData = function(service,param,netid,creds_id) {
   serviceURL = serviceMap[service]+param;
-  return ws_client.get_http_authorization_header(config.BYU_credentials[creds_id].key, config.BYU_credentials[creds_id].secret, ws_client.KEY_TYPE_API, ws_client.ENCODING_NONCE, serviceURL, "",netid,"application/json",ws_client.HTTP_METHOD_GET,true).then(function(headerVal) {
+  return ws_client.get_http_authorization_header(config.BYU_credentials[creds_id].key, config.BYU_credentials[creds_id].secret, ws_client.KEY_TYPE_API, ws_client.ENCODING_NONCE, serviceURL,"",netid,"application/json",ws_client.HTTP_METHOD_GET,true).then(function(headerVal) {
     var options = {
       method: 'GET',
       uri: serviceURL,
