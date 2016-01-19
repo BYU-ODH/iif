@@ -43,7 +43,7 @@ exports.createApplication = function(req, res, next) {
         for (var att in packet) {
           confmessage+=att+": "+packet[att]+"\n";
         }
-        confmessage+="\nIf you have any questions, please contact Humanities Advisement and Careers (1175 JFSB, 801.422.4789, humanities-advisement@byu.edu)";
+        confmessage+="\nIf you have any questions, please contact Tayler Goodman (1175 JFSB, 801.422.4789, taylergoodman@byu.edu)";
         packet.courses="";
         packet.major="";
 
@@ -70,12 +70,13 @@ exports.createApplication = function(req, res, next) {
 
         var app = new Application(packet);
         app.save().then(function() {
-          var recipients=['"'+config.notifications.approver.name+'" <'+config.notifications.approver.email+'>','"'+req.session_state.student.fullname+'" <'+req.session_state.student.email+'>'];
+          var recipients=['"'+req.session_state.student.fullname+'" <'+req.session_state.student.email+'>','"'+config.notifications.approver.name+'" <'+config.notifications.approver.email+'>',];
           recipients.forEach(function(recipient,idx) {
-            if (idx===0) {
-              confmessage="An application for internship funding for the BYU college of Humanities was recently submitted. Here are the details.\n\n";
+            var confmessage_to_send=confmessage;
+            if (idx===1) {
+              confmessage_to_send="An application for internship funding for the BYU college of Humanities was recently submitted. Here are the details.\n\n";
               for (var att in packet) {
-                confmessage+=att+": "+packet[att]+"\n";
+                confmessage_to_send+=att+": "+packet[att]+"\n";
               }
             }
             transporter.sendMail({
