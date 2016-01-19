@@ -23,5 +23,6 @@ var config = {
       	key: fs.readFileSync('/etc/ssl/private/jmcdonald_byu_edu.key'),
       	ca: fs.readFileSync('/etc/ssl/certs/jmcdonald_ca.crt')
     }
+  }
 };
 module.exports = config;

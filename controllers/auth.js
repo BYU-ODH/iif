@@ -6,7 +6,7 @@ var cas = require('byu-cas'),
     Student = require("../models/student");
 
 var locateStudent = function(token,netid,name,personid,email,byuid) {
-  query = Student.where({"netid":netid});
+  var query = Student.where({"netid":netid});
   return query.findOne().then(function(student) {
     if (student) {
       if (student.email!==email) {

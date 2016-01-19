@@ -54,7 +54,7 @@ function valid_encoding_types(encoding_type) {
 }
 
 function get_body_from_file(file_name) {
-  return fs.readFileAsync(filename).then(function(data) {
+  return fs.readFileAsync(file_name).then(function(data) {
     return data.replace(/(\r\n|\n|\r)/gm,"");
   },function(err) {
     return "";
@@ -104,7 +104,7 @@ function get_nonce(apiKey, actor) {
 }
 
 function _split_url(u) {
-  parsed_url=url.parse(u);
+  var parsed_url=url.parse(u);
   return Array(parsed_url.host,parsed_url.pathname);
 }
 
@@ -116,7 +116,7 @@ function _sort_params(params_str) {
   }
   else {
     tokens.forEach(function(token,idx) {
-      tpair=token.split("=");
+      var tpair=token.split("=");
       if (!(tpair[0] in params)) {
         params[tpair[0]]=tpair[1];
       }
@@ -170,7 +170,7 @@ function nonce_encode(sharedSecret, nonceValue) {
 
 exports.get_http_authorization_header = function(apiKey, sharedSecret, keyType, encodingType, url, requestBody, actor,contentType, httpMethod, actorInHash) {
   var current_timestamp=moment.unix(Date.now()).format('YYYY-MM-DD HH:mm:ss');
-      nonceKey = "",
+      var nonceKey = "",
       base64encoded_hmac=null;
       
   if (!valid_key_type(keyType)) {
@@ -179,7 +179,7 @@ exports.get_http_authorization_header = function(apiKey, sharedSecret, keyType, 
 
   if (encodingType === ENCODING_URL) {
     return url_encode(sharedSecret, current_timestamp, url, requestBody, contentType, httpMethod, actor, actorInHash).then(function(base64encoded_hmac) {
-      actor_value="";
+      var actor_value="";
       if (actor) {
         actor_value = "," + actor;
       }
@@ -224,15 +224,15 @@ exports.authorize_request = function(requestedUrl, authHeader, apiKey, sharedSec
     
     wsId = wsId.split(' ')[1];
     return get_nonce(apiKey, actor).then(function(nonce) {
-      data = {
+      var data = {
         'wsId': wsId,
         'messageDigest': messageDigest,
         'timestamp': timestamp,
         'message': requestedUrl
       };
-      var nonceDigest = nonce_encode(sharedSecret, nonce.nonceValue);
-      auth = 'Nonce-Encoded-API-Key '+apiKey+','+none.nonceKey+','+nonceDigest;
-      var options = {
+      var nonceDigest = nonce_encode(sharedSecret, nonce.nonceValue),
+          auth = 'Nonce-Encoded-API-Key '+apiKey+','+nonce.nonceKey+','+nonceDigest,
+          options = {
           method: "POST",
           uri: authUrl,
           data: data,
@@ -242,7 +242,7 @@ exports.authorize_request = function(requestedUrl, authHeader, apiKey, sharedSec
           resolveWithFullResponse: true
       };
       return request(options).then(function(response) {
-        r = JSON.parse(response.body);
+        var r = JSON.parse(response.body);
         return r.personId;
       });
     });

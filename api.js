@@ -1,8 +1,7 @@
 var env = process.env.NODE_ENV || 'development',
     config = require('./config.local')[env];
 
-var fs= require('fs'),
-    bunyan = require('bunyan'),
+var bunyan = require('bunyan'),
     restify = require('restify'),
     mongoose = require('mongoose'),
     sessions = require('client-sessions'),
@@ -41,7 +40,7 @@ var server = restify.createServer({
 
 var creds=config.database.user+":"+config.database.passwd;
 var conn_uri='mongodb://'+creds+'@'+config.database.host+':'+config.database.port+'/'+config.database.db;
-var db=mongoose.connect(conn_uri,['students','applications']);
+mongoose.connect(conn_uri,['students','applications']);
 
 server.use(restify.acceptParser(server.acceptable));
 server.use(restify.bodyParser());

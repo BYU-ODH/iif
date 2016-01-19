@@ -12,8 +12,8 @@ var serviceMap = {
   "WeeklySchedService" : "https://ws.byu.edu/rest/v1.0/academic/registration/studentschedule/"
 };
 
-getStudentData = function(service,param,netid,creds_id) {
-  serviceURL = serviceMap[service]+param;
+var getStudentData = function(service,param,netid,creds_id) {
+  var serviceURL = serviceMap[service]+param;
   return ws_client.get_http_authorization_header(config.BYU_credentials[creds_id].key, config.BYU_credentials[creds_id].secret, ws_client.KEY_TYPE_API, ws_client.ENCODING_NONCE, serviceURL,"",netid,"application/json",ws_client.HTTP_METHOD_GET,true).then(function(headerVal) {
     var options = {
       method: 'GET',
@@ -33,13 +33,13 @@ exports.createApplication = function(req, res, next) {
         packet=JSON.parse(req.body);
 
     getStudentData("RecMainService",req.session_state.student.personid.toString(),req.session_state.netid,"grants").then(function(records) {
-      numsem = (parseInt(packet.numericSemester)===7) ? "4" : packet.numericSemester.toString();
+      var numsem = (parseInt(packet.numericSemester,10)===7) ? "4" : packet.numericSemester.toString();
       getStudentData("WeeklySchedService",req.session_state.student.personid.toString()+"/"+packet.year.toString()+numsem,req.session_state.netid,"humanities").then(function(schedule) {
         packet.netid = req.session_state.netid;
         packet.byuid = req.session_state.byuid;
         packet.fullname = req.session_state.student.fullname;
         packet.email = req.session_state.student.email;
-        confmessage="An application for internship funding for the BYU college of Humanities was recently submitted. Here are the details.\n\n";
+        var confmessage="An application for internship funding for the BYU college of Humanities was recently submitted. Here are the details.\n\n";
         for (var att in packet) {
           confmessage+=att+": "+packet[att]+"\n";
         }
@@ -47,7 +47,7 @@ exports.createApplication = function(req, res, next) {
         packet.courses="";
         packet.major="";
 
-        schedule_obj=JSON.parse(schedule.body);
+        var schedule_obj=JSON.parse(schedule.body);
         schedule_obj.WeeklySchedService.response.schedule_table.forEach(function(course,idx) {
           if (packet.courses!=="") {
             packet.courses+=",";
@@ -55,7 +55,7 @@ exports.createApplication = function(req, res, next) {
           packet.courses+=course.course;
         });
 
-        records_obj=JSON.parse(records.body.replace("data list is missing ending delimiter",""));
+        var records_obj=JSON.parse(records.body.replace("data list is missing ending delimiter",""));
         records_obj.RecMainService.response.Major.forEach(function(m,idx) {
           if (packet.major!=="") {
             packet.major+=",";
@@ -70,7 +70,7 @@ exports.createApplication = function(req, res, next) {
 
         var app = new Application(packet);
         app.save().then(function() {
-          recipients=['"'+config.notifications.approver.name+'" <'+config.notifications.approver.email+'>','"'+req.session_state.student.fullname+'" <'+req.session_state.student.email+'>'];
+          var recipients=['"'+config.notifications.approver.name+'" <'+config.notifications.approver.email+'>','"'+req.session_state.student.fullname+'" <'+req.session_state.student.email+'>'];
           recipients.forEach(function(recipient,idx) {
             if (idx===0) {
               confmessage="An application for internship funding for the BYU college of Humanities was recently submitted. Here are the details.\n\n";
@@ -78,6 +78,7 @@ exports.createApplication = function(req, res, next) {
                 confmessage+=att+": "+packet[att]+"\n";
               }
             }
+            console.log(recipient);
             transporter.sendMail({
               from: '"Humanities Internship Funding System" <humplus-funding@byu.edu>',
               to: recipient,
