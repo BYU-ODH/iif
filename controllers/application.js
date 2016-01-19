@@ -78,7 +78,6 @@ exports.createApplication = function(req, res, next) {
                 confmessage+=att+": "+packet[att]+"\n";
               }
             }
-            console.log(recipient);
             transporter.sendMail({
               from: '"Humanities Internship Funding System" <humplus-funding@byu.edu>',
               to: recipient,
