@@ -83,7 +83,7 @@ exports.createApplication = function(req, res, next) {
               from: '"Humanities Internship Funding System" <humplus-funding@byu.edu>',
               to: recipient,
               subject: 'New Student Internship Funding Request',
-              text: confmessage
+              text: confmessage_to_send
             });
           });
           res.json({
