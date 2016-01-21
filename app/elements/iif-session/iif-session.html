@@ -20,6 +20,7 @@
     <div hidden$="{{loggedOut(netid)}}">
       <p>Your name: <span>{{student.fullname}}</span></p>
       <form is="iron-form" id="iifform" method="post" action="#">
+        <paper-input size="25" name="email" label="Your preferred email" required></paper-input><br/><br/>
         <paper-dropdown-menu label="Internship location" name="location" required>
           <paper-menu class="dropdown-content" id="locationoptions">
             <template is="dom-repeat" items="{{_locations}}">
