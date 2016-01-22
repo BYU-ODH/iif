@@ -42,7 +42,7 @@ exports.createApplication = function(req, res, next) {
         for (var att in packet) {
           confmessage+=att+": "+packet[att]+"\n";
         }
-        confmessage+="\nIf you have any questions, please contact Tayler Goodman (1175 JFSB, 801.422.4789, taylergoodman@byu.edu)";
+        confmessage+="\nIf you have any questions, please contact Tayler Goodman (1175 JFSB, 801.422.4789, taylergoodman@byu.edu). You will be contacted directly once your application has been reviewed for eligibility.";
         packet.courses="";
         packet.major="";
 
