@@ -38,11 +38,6 @@ exports.createApplication = function(req, res, next) {
         packet.netid = req.session_state.netid;
         packet.byuid = req.session_state.byuid;
         packet.fullname = req.session_state.student.fullname;
-        var confmessage="An application for internship funding for the BYU college of Humanities was recently submitted. Here are the details.\n\n";
-        for (var att in packet) {
-          confmessage+=att+": "+packet[att]+"\n";
-        }
-        confmessage+="\nIf you have any questions, please contact Tayler Goodman (1175 JFSB, 801.422.4789, taylergoodman@byu.edu). You will be contacted directly once your application has been reviewed for eligibility.";
         packet.courses="";
         packet.major="";
 
@@ -71,7 +66,7 @@ exports.createApplication = function(req, res, next) {
         app.save().then(function() {
           var recipients=['"'+req.session_state.student.fullname+'" <'+req.session_state.student.email+'>','"'+config.notifications.approver.name+'" <'+config.notifications.approver.email+'>',];
           recipients.forEach(function(recipient,idx) {
-            var confmessage_to_send=confmessage;
+            var confmessage_to_send="You have successfully submitted your College Internship Funding application. You will be contacted directly within two weeks regarding your funding eligibility. If you have any questions, please contact Tayler Goodman (1175 JFSB, 801.422.4789, taylergoodman@byu.edu).";
             if (idx===1) {
               confmessage_to_send="An application for internship funding for the BYU college of Humanities was recently submitted. Here are the details.\n\n";
               for (var att in packet) {
