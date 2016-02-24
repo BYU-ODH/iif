@@ -17,6 +17,8 @@ var applicationSchema = new Schema({
   netid: {type: String, required: true},
   fullname: String,
   major: String,
+  secondmajor: String,
+  minor: String,
   classStanding: String,
   gpa: String,
   courses: String,

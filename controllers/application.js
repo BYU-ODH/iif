@@ -51,12 +51,19 @@ exports.createApplication = function(req, res, next) {
 
         var records_obj=JSON.parse(records.body.replace("data list is missing ending delimiter",""));
         records_obj.RecMainService.response.Major.forEach(function(m,idx) {
-          if (packet.major!=="") {
-            packet.major+=",";
-          }
-          packet.major+=m.department;
           if (m.type!=="null") {
-            packet.major+=" "+m.type;
+            if (packet.major==="") {
+              packet.major=m.department+=" "+m.type;
+            }
+            else {
+              packet.secondmajor+=m.department+=" "+m.type+" ";
+            }
+          }
+          else {
+            if (packet.minor!=="") {
+              packet.minor+=",";
+            }
+            packet.minor+=m.department;
           }
         });
         packet.classStanding=records_obj.RecMainService.response.classStanding;
