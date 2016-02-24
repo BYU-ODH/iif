@@ -40,6 +40,8 @@ exports.createApplication = function(req, res, next) {
         packet.fullname = req.session_state.student.fullname;
         packet.courses="";
         packet.major="";
+        packet.secondmajor="";
+        packet.minor="";
 
         var schedule_obj=JSON.parse(schedule.body);
         schedule_obj.WeeklySchedService.response.schedule_table.forEach(function(course,idx) {
@@ -48,6 +50,9 @@ exports.createApplication = function(req, res, next) {
           }
           packet.courses+=course.course;
         });
+        if (packet.courses==="") {
+          packet.courses="\n";
+        }
 
         var records_obj=JSON.parse(records.body.replace("data list is missing ending delimiter",""));
         records_obj.RecMainService.response.Major.forEach(function(m,idx) {
@@ -66,6 +71,12 @@ exports.createApplication = function(req, res, next) {
             packet.minor+=m.department;
           }
         });
+        if (packet.secondmajor==="") {
+          packet.secondmajor="\n";
+        }
+        if (packet.minor==="") {
+          packet.minor="\n";
+        }
         packet.classStanding=records_obj.RecMainService.response.classStanding;
         packet.gpa=records_obj.RecMainService.response['Credit List'][0].gpa;
 
