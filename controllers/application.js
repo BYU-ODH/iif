@@ -56,7 +56,7 @@ exports.createApplication = function(req, res, next) {
 
         var records_obj=JSON.parse(records.body.replace("data list is missing ending delimiter",""));
         records_obj.RecMainService.response.Major.forEach(function(m,idx) {
-          if (m.type!=="null") {
+          if (m.type!==null) {
             if (packet.major==="") {
               packet.major=m.department+=" "+m.type;
             }
