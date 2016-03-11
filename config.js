@@ -1,4 +1,4 @@
-var fs= require('fs');
+var fs= require('fs-extra-promise');
 
 var config = {
   development: {
