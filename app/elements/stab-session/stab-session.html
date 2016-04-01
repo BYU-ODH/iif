@@ -1,0 +1,105 @@
+<link href="../../bower_components/iron-icons/iron-icons.html" rel="import"/>
+<link href="../../bower_components/iron-icon/iron-icon.html" rel="import"/>
+<link href="../../bower_components/iron-ajax/iron-ajax.html" rel="import"/>
+<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link href="../semester-picker/semester-picker.html" rel="import"/>
+<dom-module id="stab-session">
+  <template>
+    <iron-ajax id="sessioneer" auto url="/sessions" content-type="application/json" handle-as="json" debounce-duration="300" method="get" on-response="initializeStudent"></iron-ajax>
+    <iron-ajax id="appMan" url="/applications" handle-as="json" debounce-duration="300" method="post" on-response="appConfirmed"></iron-ajax>
+    <div hidden$="{{studentExists(netid)}}">
+      <p>If you're interested in being considered for funding for your upcoming study abroad, please sign in and complete the short form.</p>
+      <paper-button raised on-click="startLoginFlow">
+        <iron-icon icon="perm-identity"></iron-icon> Sign in
+      </paper-button>
+    </div>
+    <div hidden$="{{loggedOut(netid)}}">
+      <p>Your name: <span>{{student.fullname}}</span></p>
+      <form is="iron-form" id="stabform" method="post" action="#">
+        <paper-input size="25" name="email" label="Your preferred email" required></paper-input><br/><br/>
+        <paper-input size="50" label="Location of your Study Abroad" name="location" required></paper-input><br/><br/>
+        <paper-input size="50" label="Faculty Director" name="director" required></paper-input><br/><br/>
+        <semester-picker trimester="breakable" required id="appSemester"></semester-picker><br/><br/>
+        <paper-input size="8" label="Program Fee" required></paper-input><br/><br/>
+        <!-- <paper-input-decorator label="Program Fee" id="fee-dec" error="Please enter a valid $ amount">
+             <input id="fee" is="core-input" pattern="^[$0-9][0-9]*.?[0-9]{0,2}" onblur="validateFee()"> Program Fee
+             </paper-input-decorator> -->
+        <paper-toggle-button name="fafsa" active></paper-toggle-button>I recognize I must meet have an updated FAFSA on file with the university to be considered for a college program discount. <br/>
+        <paper-toggle-button name="permission" active></paper-toggle-button> I grant permission to BYU's College of Humanities to access information and records pertinent to my application for funding, in order to determine eligibility and to enable demographic analysis<br/>(Any identifying information will remain anonymous)<br/><br/><br/>
+        <paper-button raised on-click="submitForm">Submit Funding Request</paper-button><span hidden$="{{armedForSubmission}}"><paper-spinner alt="Saving Application" active></paper-spinner> <span>saving application ...</span></span>
+      </form>
+    </div>
+  </template>
+  <script>
+   /* function validateFee() {
+      var decorator = document.getElementById('fee-dec');
+      var input = document.getElementById('fee');
+      decorator.isInvalid = !input.validity.valid;
+      }
+    */
+    Polymer({
+      is: 'stab-session',
+      properties: {
+        netid: {
+          type: String,
+          value: ""
+        },
+        student: {
+          type: Object
+        },
+        armedForSubmission: {
+          type: Boolean,
+          value: true
+        }
+      },
+      initializeStudent: function(event) {
+        console.log(event.detail.response);
+        if ("netid" in event.detail.response) {
+          this.netid = event.detail.response.netid;
+          this.student = event.detail.response.student;
+        }
+      },
+      toggleSpinner: function() {
+        this.armedForSubmission=!this.armedForSubmission;
+      },
+      studentExists: function() {
+        return this.netid!=="";
+      },
+      loggedOut: function() {
+        return this.netid==="";
+      },
+      startLoginFlow: function() {
+        page("/login");
+      },
+      submitForm: function() {
+        if (this.$.stabform.validate()) {
+          this.toggleSpinner();
+          var submission=this.$.stabform.serialize();
+          submission.numericSemester=this.$.appSemester.numericSemester;
+          submission.permission=(submission.permission==="on") ? true : false;
+          this.$.appMan.body=JSON.stringify(submission);
+          this.$.appMan.generateRequest();
+        }
+      },
+      appConfirmed: function(event) {
+        this.toggleSpinner();
+        this.$.stabform.reset();
+        window.scrollTo(0,0);
+        page("/confirmed");
+      },
+      ready: function() {
+        this._semesters=[
+          "Fall 2016",
+          "Winter 2017",
+          "Spring 2017",
+          "Summer 2017"
+        ];
+        /* this._semesters.sort(); */
+      }
+    });
+  </script>
+</dom-module>
