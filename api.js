@@ -40,6 +40,7 @@ var server = restify.createServer({
 
 var creds=config.database.user+":"+config.database.passwd;
 var conn_uri='mongodb://'+creds+'@'+config.database.host+':'+config.database.port+'/'+config.database.db;
+
 mongoose.connect(conn_uri,['students','applications']);
 
 server.use(restify.acceptParser(server.acceptable));

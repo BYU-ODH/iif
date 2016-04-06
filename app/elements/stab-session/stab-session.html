@@ -5,6 +5,7 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link href="../semester-picker/semester-picker.html" rel="import"/>
 <dom-module id="stab-session">
@@ -23,13 +24,21 @@
         <paper-input size="25" name="email" label="Your preferred email" required></paper-input><br/><br/>
         <paper-input size="50" label="Location of your Study Abroad" name="location" required></paper-input><br/><br/>
         <paper-input size="50" label="Faculty Director" name="director" required></paper-input><br/><br/>
+        <paper-input size="8" label="Program Fee" name="fee" type="number" required>
+          <div prefix>$</div>
+        </paper-input><br/><br/>
         <semester-picker trimester="breakable" required id="appSemester"></semester-picker><br/><br/>
-        <paper-input size="8" label="Program Fee" required></paper-input><br/><br/>
+
         <!-- <paper-input-decorator label="Program Fee" id="fee-dec" error="Please enter a valid $ amount">
              <input id="fee" is="core-input" pattern="^[$0-9][0-9]*.?[0-9]{0,2}" onblur="validateFee()"> Program Fee
              </paper-input-decorator> -->
         <paper-toggle-button name="fafsa" active></paper-toggle-button>I recognize I must meet have an updated FAFSA on file with the university to be considered for a college program discount. <br/>
-        <paper-toggle-button name="permission" active></paper-toggle-button> I grant permission to BYU's College of Humanities to access information and records pertinent to my application for funding, in order to determine eligibility and to enable demographic analysis<br/>(Any identifying information will remain anonymous)<br/><br/><br/>
+        <paper-toggle-button name="permission" active></paper-toggle-button> I grant permission to BYU's College of Humanities to access information and records pertinent to my application for funding, in order to determine eligibility and for statistical analysis. <br/><br/><br/>
+
+        Use the space below to provide details about your circumstances that impact your ability to afford study abroad. <br/>
+        <paper-input size="500" label="Circumstances" name="explanation" required></paper-input><br/><br/>          
+        
+<br/><br/><br/>
         <paper-button raised on-click="submitForm">Submit Funding Request</paper-button><span hidden$="{{armedForSubmission}}"><paper-spinner alt="Saving Application" active></paper-spinner> <span>saving application ...</span></span>
       </form>
     </div>
@@ -80,6 +89,7 @@
           this.toggleSpinner();
           var submission=this.$.stabform.serialize();
           submission.numericSemester=this.$.appSemester.numericSemester;
+          submission.fafsa=(submission.fafsa==="on") ? true : false;
           submission.permission=(submission.permission==="on") ? true : false;
           this.$.appMan.body=JSON.stringify(submission);
           this.$.appMan.generateRequest();
