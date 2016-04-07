@@ -1,4 +1,5 @@
-var env = process.env.NODE_ENV || 'development',
+// var env = process.env.NODE_ENV || 'development',
+var env = process.env.NODE_ENV || 'production',
     config = require('./config.local')[env];
 
 var bunyan = require('bunyan'),

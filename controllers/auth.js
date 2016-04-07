@@ -1,5 +1,6 @@
 const CAS_SERVICE="https://cas.byu.edu/cas/";
-var env = process.env.NODE_ENV || 'development',
+// var env = process.env.NODE_ENV || 'development',
+var env = process.env.NODE_ENV || 'production',
     config = require('../config.local')[env];
 
 var cas = require('byu-cas'),

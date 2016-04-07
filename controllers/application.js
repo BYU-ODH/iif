@@ -1,4 +1,5 @@
-var env = process.env.NODE_ENV || 'development',
+// var env = process.env.NODE_ENV || 'development',
+var env = process.env.NODE_ENV || 'production',
     config = require('../config.local')[env];
 
 var Application = require("../models/application"),
@@ -84,17 +85,17 @@ exports.createApplication = function(req, res, next) {
         app.save().then(function() {
           var recipients=['"'+req.session_state.student.fullname+'" <'+req.session_state.student.email+'>','"'+config.notifications.approver.name+'" <'+config.notifications.approver.email+'>',];
           recipients.forEach(function(recipient,idx) {
-            var confmessage_to_send="You have successfully submitted your College Internship Funding application. You will be contacted directly within two weeks regarding your funding eligibility. If you have any questions, please contact Tayler Goodman (1175 JFSB, 801.422.4789, taylergoodman@byu.edu).";
+            var confmessage_to_send="You have successfully submitted your College Study Abroad Funding application. You will be notified directly before your final payment is due. If you have any questions, please contact the college secretary at 422-2775 or humanities@byu.edu.";
             if (idx===1) {
-              confmessage_to_send="An application for internship funding for the BYU college of Humanities was recently submitted. Here are the details.\n\n";
+              confmessage_to_send="An application for study abroad funding for the BYU college of Humanities was recently submitted. Here are the details.\n\n";
               for (var att in packet) {
                 confmessage_to_send+=att+": "+packet[att]+"\n";
               }
             }
             transporter.sendMail({
-              from: '"Humanities Internship Funding System" <humplus-funding@byu.edu>',
+              from: '"Humanities Study Abroad Funding" <humanities@byu.edu>',
               to: recipient,
-              subject: 'New Student Internship Funding Request',
+              subject: 'New Student Study Abroad Funding Request',
               text: confmessage_to_send
             });
           });
